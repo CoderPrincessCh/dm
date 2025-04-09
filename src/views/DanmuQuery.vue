@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <h1 class="text-xl font-bold mb-4">弹幕查询工具</h1>
+    <h1 class="text-xl font-bold mb-4">弹幕查询</h1>
     <div class="flex items-center gap-2 mb-4">
       <input
         v-model="soundid"
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch  } from 'vue'
 import * as XLSX from 'xlsx' 
 
 const soundid = ref('')
@@ -47,7 +47,14 @@ const userSet = new Set<string>();
 let firstDanmu: string | null = null;
 
 // 用来存储用户ID和弹幕内容
-const userDanmuData: { userId: string, content: string }[] = [];
+const userDanmuData = ref<{ userId: string, content: string }[]>([]);
+
+watch(soundid, () => {
+  // 每次输入新的 soundid 时清空数据
+  userDanmuData.value = [];
+  userSet.clear();
+  uniqueUserCount.value = 0;
+});
 
 const fetchDanmu = async () => {
   if (!soundid.value.trim()) {
@@ -65,8 +72,6 @@ const fetchDanmu = async () => {
 
       // 提取弹幕数据
       const danmuNodes = xmlDoc.getElementsByTagName('d');
-      
-      
 
       // 遍历所有弹幕并提取信息
       for (let i = 0; i < danmuNodes.length; i++) {
@@ -74,18 +79,10 @@ const fetchDanmu = async () => {
         const pValue = danmu.getAttribute('p') || ""; // 获取 p 属性值
         const userId = pValue.split(',')[6];  // 用户ID是 p 属性的第7个值
 
-        // 去重：添加到 set 中
-        // userSet.add(userId);
-
-        // 记录第一次发的弹幕
-        // if (!firstDanmu) {
-        //   firstDanmu = danmu.textContent || "";
-        // }
-
         // 如果这个用户ID第一次出现，保存弹幕
         if (!userSet.has(userId)) {
           userSet.add(userId);
-          userDanmuData.push({
+          userDanmuData.value.push({
             userId,
             content: danmu.textContent || ""
           });
@@ -94,14 +91,6 @@ const fetchDanmu = async () => {
 
       // 更新去重后的用户ID个数
       uniqueUserCount.value = userSet.size;
-      // 更新第一次发的弹幕内容
-      // firstUserDanmu.value = firstDanmu || "没有找到第一次发的弹幕";
-
-      // 处理弹幕内容（这里只是一个例子，假设需要显示所有的弹幕）
-      // danmuList.value = Array.from(danmuNodes).map(danmu => ({
-      //   content: danmu.textContent
-      // }));
-
     })
     .catch(error => console.error('请求失败:', error))
     .finally(() => {
@@ -111,10 +100,15 @@ const fetchDanmu = async () => {
 
 // 导出为 Excel 文件
 const exportExcel = () => {
+  // 校验是否有去重后的弹幕数据
+  if (userDanmuData.value.length === 0) {
+    alert('没有弹幕数据可导出');
+    return;
+  }
   // 构建数据：添加表头
   const sheetData = [
     ['用户ID', '弹幕内容'], // 表头
-    ...userDanmuData.map(item => [item.userId, item.content])
+    ...userDanmuData.value.map(item => [item.userId, item.content])
   ];
 
   // 创建工作簿
@@ -127,4 +121,5 @@ const exportExcel = () => {
   // 导出 Excel 文件
   XLSX.writeFile(wb, 'danmu_data.xlsx');
 }
+
 </script>
