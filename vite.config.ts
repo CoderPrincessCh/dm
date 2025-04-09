@@ -26,4 +26,9 @@ export default defineConfig({
       },
     },
   },
+  base: '/dm/',  // 修改为你的仓库名
+  build: {
+    outDir: 'dist',  // 打包输出目录
+    assetsDir: 'assets',  // 静态资源目录
+  },
 })
