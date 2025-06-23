@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <h1 class="text-xl font-bold mb-4">弹幕查询</h1>
+    <h1 class="text-xl font-bold mb-4">弹幕查询(第一版vue3实现单一音频)</h1>
     <div class="flex items-center gap-2 mb-4">
       <input
         v-model="soundid"
