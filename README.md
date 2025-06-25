@@ -5,7 +5,7 @@
 
 ## 📦 下载地址
 
-👉 请前往 [Releases](https://github.com/CoderPrincessCh/dm/releases/tag/1.0.0) 页面下载最新版本的 `danmu.exe`
+👉 请前往 [Releases](https://github.com/CoderPrincessCh/dm/releases/tag/1.0.2) 页面下载最新版本的 `danmu.exe``danmu_wordcloud.exe`
 
 ## 🧾 功能说明
 
